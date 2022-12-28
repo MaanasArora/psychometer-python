@@ -8,7 +8,7 @@ class LikertQuestion:
 
 @dataclass
 class LikertScoreQuestion:
-    question: LikertQuestion
+    question_number: int
     weight: float
 
 
@@ -21,8 +21,8 @@ class LikertScore:
     def score(self, answers: list[int]):
         return sum(
             [
-                answers[i] * q.weight
-                for i, q in enumerate(self.questions)
+                answers[q.question_number] * q.weight
+                for q in self.questions
             ]
         )
 
@@ -40,7 +40,8 @@ class LikertResult:
     test: LikertTest
     scores: list[float]
 
-    def from_answers(self, test: LikertTest, answers: list[int]):
-        scores = map(LikertScore.score, test.scoring, answers)
+    @staticmethod
+    def from_answers(test: LikertTest, answers: list[int]):
+        scores = [scoring.score(answers) for scoring in test.scoring]
 
         return LikertResult(test, scores)
